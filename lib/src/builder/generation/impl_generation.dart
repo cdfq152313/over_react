@@ -54,6 +54,8 @@ class ImplGenerator {
 
   SourceFile sourceFile;
 
+  List propsList = [];
+
   generate(ParsedDeclarations declarations) {
     if (declarations.declaresComponent) {
       final bool isComponent2 = declarations.component2 != null;
@@ -170,6 +172,34 @@ class ImplGenerator {
               'backingProps == null ? $jsMapImplName(JsBackedMap()) : $propsImplName(backingProps);'
         );
       }
+
+      /// ADDDD
+      outputContentsBuffer.writeln('');
+      outputContentsBuffer.writeln('extension ${factoryName}Extension on UiFactory<$consumablePropsName>{');
+
+      String parameters = propsList.isNotEmpty ? propsList.map((prop) => '${prop[0]} ${prop[1]}').join(', ') : '';
+      outputContentsBuffer.writeln('ReactElement g({key, children, $parameters}) {');
+      outputContentsBuffer.writeln('final __builder = this();');
+      for(final prop in propsList){
+        final propName = prop[1];
+        outputContentsBuffer.writeln('if($propName != null) __builder.$propName = $propName;');
+      }
+      outputContentsBuffer.writeln('if(key != null) __builder.key = key;');
+      outputContentsBuffer.writeln('return children == null ? __builder() : __builder(children);');
+      outputContentsBuffer.writeln('}');
+
+      outputContentsBuffer.writeln('$consumablePropsName props({key, $parameters}) {');
+      outputContentsBuffer.writeln('final __builder = this();');
+      for(final prop in propsList){
+        final propName = prop[1];
+        outputContentsBuffer.writeln('if($propName != null) __builder.$propName = $propName;');
+      }
+      outputContentsBuffer.writeln('if(key != null) __builder.key = key;');
+      outputContentsBuffer.writeln('return __builder;');
+      outputContentsBuffer.writeln('}');
+
+      outputContentsBuffer.writeln('}');
+      /// ADDDD
 
       outputContentsBuffer.write(_generateConcretePropsOrStateImpl(
         type: AccessorType.props,
@@ -524,6 +554,8 @@ class ImplGenerator {
                 '  @override\n'
                 '${metadataSrc.toString()}'
                 '  set $accessorName(${setterTypeString}value) => $proxiedMapName[$keyConstantName] = value;\n';
+
+            propsList.add([typeString, accessorName]);
 
             output.write(generatedAccessor);
 
