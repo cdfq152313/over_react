@@ -54,6 +54,9 @@ class ImplGenerator {
 
   SourceFile sourceFile;
 
+  List<List<String>> propsList = [];
+  String generic = '';
+
   generate(ParsedDeclarations declarations) {
     if (declarations.declaresComponent) {
       final bool isComponent2 = declarations.component2 != null;
@@ -170,6 +173,46 @@ class ImplGenerator {
               'backingProps == null ? $jsMapImplName(JsBackedMap()) : $propsImplName(backingProps);'
         );
       }
+
+      /// ADDDD
+      outputContentsBuffer.writeln('');
+      outputContentsBuffer.writeln('extension ${factoryName}Extension on UiFactory<$consumablePropsName>{');
+
+      String parameters = propsList.isNotEmpty ? propsList.map((prop) => '${prop[0]} ${prop[1]}').join(', ') : '';
+      outputContentsBuffer.writeln('ReactElement g$generic({key, children, $parameters}) {');
+
+
+      final generics = generic != '' ? generic.substring(1, generic.length-1).split(',').map((s) => s.trim()).toSet() : <String>{};
+      final functionRegExp = RegExp(r'Function\((.+)\)');
+
+      fillBuilder(){
+        outputContentsBuffer.writeln('final __builder = this();');
+        for(final prop in propsList){
+          final propType = prop[0];
+          final propName = prop[1];
+          final functionParamTypes = functionRegExp.firstMatch(propType)?.group(1)?.split(',')?.map((s) => s.trim().split(' ').first)?.toSet();
+
+          if(functionParamTypes != null && functionParamTypes.intersection(generics).isNotEmpty) {
+            /// This is for function which has generic type parameter
+            final params = [for (int i = 0; i < functionParamTypes.length; ++i) 'a$i'].join(',');
+            outputContentsBuffer.writeln('if($propName != null) __builder.$propName = ($params) => $propName($params);');
+          } else{
+            outputContentsBuffer.writeln('if($propName != null) __builder.$propName = $propName;');
+          }
+        }
+        outputContentsBuffer.writeln('if(key != null) __builder.key = key;');
+      }
+      fillBuilder();
+      outputContentsBuffer.writeln('return children == null ? __builder() : __builder(children);');
+      outputContentsBuffer.writeln('}');
+
+      outputContentsBuffer.writeln('$consumablePropsName props$generic({key, $parameters}) {');
+      fillBuilder();
+      outputContentsBuffer.writeln('return __builder;');
+      outputContentsBuffer.writeln('}');
+
+      outputContentsBuffer.writeln('}');
+      /// ADDDD
 
       outputContentsBuffer.write(_generateConcretePropsOrStateImpl(
         type: AccessorType.props,
@@ -525,6 +568,8 @@ class ImplGenerator {
                 '${metadataSrc.toString()}'
                 '  set $accessorName(${setterTypeString}value) => $proxiedMapName[$keyConstantName] = value;\n';
 
+            propsList.add([typeString, accessorName]);
+
             output.write(generatedAccessor);
 
             logger.fine(messageWithSpan('Generated accessor `$accessorName` with key $keyValue.',
@@ -739,6 +784,9 @@ class ImplGenerator {
         '  @override' +
         '  Map get ${type.isProps ? 'props': 'state'};\n'
     );
+    if(typeParamsOnClass.contains('<')){
+      generic = typeParamsOnClass.substring(typeParamsOnClass.indexOf('<'), typeParamsOnClass.indexOf('>')+1);
+    }
     if (type.isMixin) {
       generatedClass.writeln(_generateStaticMetaDecl(_publicPropsOrStateClassNameFromConsumerClassName(consumerClassName), type.isProps));
       generatedClass.write(_copyStaticMembers(node));
