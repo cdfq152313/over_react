@@ -203,7 +203,7 @@ class ImplGenerator {
         outputContentsBuffer.writeln('if(key != null) __builder.key = key;');
       }
       fillBuilder();
-      outputContentsBuffer.writeln('return children == null ? __builder() : __builder(children);');
+      outputContentsBuffer.writeln('return children == null ? __builder() : __builder(autoKey(children));');
       outputContentsBuffer.writeln('}');
 
       outputContentsBuffer.writeln('$consumablePropsName props$generic({key, $parameters}) {');
