@@ -45,6 +45,7 @@ class OverReactBuilder extends Builder {
     DeclarationType.propsMapViewOrFunctionComponentDeclaration,
     DeclarationType.legacyAbstractPropsDeclaration,
     DeclarationType.legacyAbstractStateDeclaration,
+    DeclarationType.flutterStyleDeclaration,
   ];
 
   @override

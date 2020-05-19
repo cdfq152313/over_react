@@ -216,4 +216,8 @@ class TypedMapNames {
   /// | Mixin-based               | FooPropsMixin   | _$metaForFooPropsMixin |
   /// | Legacy                    | _$FooProps      | _$metaForFooProps      |
   String get metaConstantName => '$_prefix${privateSourcePrefix}metaFor$_normalizedName';
+
+  /// The name of the flutter style extension
+  /// FooPropsFlutterStyleExtension
+  String get flutterStyleExtensionName => '${consumerName}FlutterStyleExtension';
 }

@@ -14,6 +14,7 @@
 
 // ignore_for_file: deprecated_member_use_from_same_package
 import 'package:logging/logging.dart';
+import 'package:over_react/src/builder/codegen/flutter_style_extension.dart';
 import 'package:source_span/source_span.dart';
 
 import 'codegen/accessors_generator.dart';
@@ -54,6 +55,9 @@ class ImplGenerator {
         break;
       case DeclarationType.stateMixinDeclaration:
         _generateStateMixin(declaration);
+        break;
+      case DeclarationType.flutterStyleDeclaration:
+        _generateFlutterStyleExtension(declaration);
         break;
       default:
         throw ArgumentError('Unhandled declaration type: $declaration');
@@ -98,6 +102,10 @@ class ImplGenerator {
     _generateUsing(TypedMapAccessorsGenerator.propsMixin(declaration));
   }
 
+  void _generateFlutterStyleExtension(FlutterStyleExtensionDeclaration declaration) {
+    _generateUsing(FlutterStyleExtension(declaration));
+  }
+
   void _generateStateMixin(StateMixinDeclaration declaration) {
     _generateUsing(TypedMapAccessorsGenerator.stateMixin(declaration));
   }
@@ -111,8 +119,7 @@ class ImplGenerator {
     _generateUsing(ComponentGenerator(declaration));
   }
 
-  void _generatePropsMapViewOrFunctionComponent(
-      PropsMapViewOrFunctionComponentDeclaration declaration) {
+  void _generatePropsMapViewOrFunctionComponent(PropsMapViewOrFunctionComponentDeclaration declaration) {
     _generateUsing(TypedMapImplGenerator.propsMapViewOrFunctionComponent(declaration));
   }
 }
