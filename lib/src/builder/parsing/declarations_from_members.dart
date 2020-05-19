@@ -152,6 +152,17 @@ Iterable<BoilerplateDeclaration> getBoilerplateDeclarations(
   }
 
   // -----------------------------------------------------------------------------------------------
+  // Flutter Style: if and only if there's only one component declared in the file.
+  if (members.factories.length == 1 && members.propsMixins.length == 1) {
+    final propsMixin = members.propsMixins.single;
+    final version = resolveVersion([propsMixin]);
+    yield FlutterStyleExtensionDeclaration(
+      version: version.version,
+      mixin: propsMixin,
+    );
+  }
+
+  // -----------------------------------------------------------------------------------------------
   //
   // Special-case handling: if there's only one component declared in the file,
   // and it's a legacy component, group the members together even if their names don't match.
