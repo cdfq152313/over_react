@@ -96,3 +96,4 @@ export 'src/util/test_mode.dart';
 export 'src/util/typed_default_props_for.dart';
 export 'src/util/validation_util.dart';
 export 'src/util/context.dart';
+export 'src/auto_key.dart';

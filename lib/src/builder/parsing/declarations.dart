@@ -30,6 +30,7 @@ enum DeclarationType {
   legacyAbstractStateDeclaration,
   propsMixinDeclaration,
   stateMixinDeclaration,
+  flutterStyleDeclaration,
 }
 
 /// Base class for a boilerplate declaration—a group boilerplate members that comprises a
@@ -344,6 +345,7 @@ class StateMixinDeclaration extends BoilerplateDeclaration with PropsOrStateMixi
   }) : super(version);
 }
 
+
 /// Factories that are grouped together via their props type.
 class FactoryGroup {
   final List<BoilerplateFactory> factories;
@@ -369,4 +371,17 @@ class FactoryGroup {
 
     return factories[0];
   }
+}
+
+/// A boilerplate declaration for a props mixin of any boilerplate version.
+///
+/// See [BoilerplateDeclaration] for more info.
+class FlutterStyleExtensionDeclaration extends PropsMixinDeclaration {
+  @override
+  get type => DeclarationType.flutterStyleDeclaration;
+
+  FlutterStyleExtensionDeclaration({
+    @required Version version,
+    @required BoilerplatePropsMixin mixin,
+  }) : super(version: version, mixin: mixin);
 }
