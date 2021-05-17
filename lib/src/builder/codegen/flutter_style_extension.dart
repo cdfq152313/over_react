@@ -46,7 +46,7 @@ class FlutterStyleExtension extends BoilerplateDeclarationGenerator {
 
   String _generateG(List<ArgumentPair> arguments, String typeParamsOnClass) {
     final buffer = StringBuffer();
-    buffer.write('ReactElement g$typeParamsOnClass({key, children,');
+    buffer.write('ReactElement g$typeParamsOnClass({key, ref, children,');
     _writeGeneral(buffer, arguments, typeParamsOnClass);
     buffer.write('return children == null ? __builder() : __builder(autoKey(children));');
     buffer.write('}');
@@ -55,7 +55,7 @@ class FlutterStyleExtension extends BoilerplateDeclarationGenerator {
 
   String _generateProps(List<ArgumentPair> arguments, String typeParamsOnClass) {
     final buffer = StringBuffer();
-    buffer.write('${names.publicName} props$typeParamsOnClass({key,');
+    buffer.write('${names.publicName} props$typeParamsOnClass({key, ref,');
     _writeGeneral(buffer, arguments, typeParamsOnClass);
     buffer.write('return __builder;');
     buffer.write('}');
@@ -83,6 +83,7 @@ class FlutterStyleExtension extends BoilerplateDeclarationGenerator {
       }
     }
     buffer.write('if(key != null) __builder.key = key;');
+    buffer.write('if(ref != null) __builder.ref = ref;');
   }
 
   List<ArgumentPair> _getArguments() {
